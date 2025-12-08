@@ -28,7 +28,7 @@ const FlashPaperCard = () => {
     setError(null);
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/secret/create", {
+      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/secret/create`, {
         message: secret,
       });
 
