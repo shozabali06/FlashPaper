@@ -9,7 +9,6 @@ import {
 import { Button } from "./ui/button";
 import { Check, Copy, Lock, Plus } from "lucide-react";
 import { Textarea } from "./ui/textarea";
-import axios from "axios";
 
 const FlashPaperCard = () => {
   const [secret, setSecret] = useState("");
@@ -28,9 +27,18 @@ const FlashPaperCard = () => {
     setError(null);
 
     try {
-      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/api/secret/create`, {
-        message: secret,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/secret/create`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: secret }),
+        }
+      );
+
+      const data = await response.json();
 
       if (!data.success) {
         setError(data.message || "Failed to create secret.");

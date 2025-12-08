@@ -34,8 +34,16 @@ export const getSecret = async (req, res) => {
     const result = await sql`
         DELETE FROM secrets
         WHERE id = ${id}
-        RETURNING message
+        RETURNING message, created_at
     `;
+
+    const secretCreatedAt = new Date(result[0].created_at).getTime();
+
+    const TIME_LIMIT = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+    const currentTime = new Date().getTime();
+
+    const timeDifference = currentTime - secretCreatedAt;
 
     if (result.length === 0) {
       return res.status(404).json({
@@ -43,7 +51,13 @@ export const getSecret = async (req, res) => {
         message: "Secret not found or already destroyed",
       });
     }
-
+    
+    if (timeDifference > TIME_LIMIT) {
+      res.status(410).json({
+        success: true,
+        message: "Secret expired"
+      })
+    }
     const secretMessage = result[0].message;
     
     res.status(200).json({ success: true, message: secretMessage });

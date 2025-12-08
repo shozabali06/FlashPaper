@@ -9,7 +9,6 @@ import {
 import { AlertTriangle, Eye, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
-import axios from "axios";
 
 const RevealCard = ({ id }) => {
   const [loading, setLoading] = useState(false);
@@ -22,30 +21,36 @@ const RevealCard = ({ id }) => {
     setError(null);
 
     try {
-      const response = await axios.get(
+      const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/secret/${id}`
       );
 
-      if (!response.data.success) {
-        if (response.status === 404) {
-          setError("Secret not found or has already been revealed.");
-        } else {
-          setError("An error occurred while retrieving the secret.");
-        }
+      if (response.status === 404) {
+        setError("Secret not found or has already been revealed.");
+        setLoading(false);
         return;
       }
 
-      const secret = response.data.message;
-      setSecret(secret);
+      if (response.status === 410) {
+        setError("This secret has expired and is no longer available.");
+        setLoading(false);
+        return;
+      }
+
+      const data = await response.json();
+
+      if (!data.success) {
+        setError("An error occurred while retrieving the secret.");
+        setLoading(false);
+        return;
+      }
+
+      setSecret(data.message);
       setRevealed(true);
       setLoading(false);
     } catch (error) {
-      if (error.response.status === 404) {
-        setError("Secret not found or has already been revealed.");
-      } else {
-        console.error("Error retrieving secret:", error);
-        setError("An error occurred while retrieving the secret.");
-      }
+      console.error("Error retrieving secret:", error);
+      setError("An error occurred while retrieving the secret.");
       setLoading(false);
     }
   };
