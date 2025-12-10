@@ -38,6 +38,13 @@ export const getSecret = async (req, res) => {
         RETURNING message, created_at
     `;
 
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: true,
+        message: "Secret not found or already destroyed",
+      });
+    }
+
     const secretCreatedAt = new Date(result[0].created_at).getTime();
 
     const TIME_LIMIT = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
@@ -45,13 +52,6 @@ export const getSecret = async (req, res) => {
     const currentTime = new Date().getTime();
 
     const timeDifference = currentTime - secretCreatedAt;
-
-    if (result.length === 0) {
-      return res.status(404).json({
-        success: true,
-        message: "Secret not found or already destroyed",
-      });
-    }
 
     if (timeDifference > TIME_LIMIT) {
       res.status(410).json({
