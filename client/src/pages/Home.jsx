@@ -7,7 +7,7 @@ const Home = () => {
       <FlashPaperCard />
       <span className="absolute bottom-2 right-2 text-sm text-muted-foreground">
         Made with ❤️ by{" "}
-        <a href="https://github.com/shozabali06" className="underline">
+        <a href="https://github.com/shozabali06" target="_blank" className="underline">
           Shozab
         </a>
       </span>
