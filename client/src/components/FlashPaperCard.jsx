@@ -46,7 +46,7 @@ const FlashPaperCard = () => {
         return;
       }
 
-      const link = `${window.location.origin}/secret/${data.id}`;
+      const link = `${window.location.origin}/secret/${data.slug}`;
       setSecretLink(link);
       setCopied(false);
       setLoading(false);

@@ -1,8 +1,11 @@
 import sql from "../configs/db.js";
+import { nanoid } from "nanoid";
 
 export const createSecret = async (req, res) => {
   try {
     const { message } = req.body;
+
+    const slug = nanoid(12);
 
     if (!message) {
       return res
@@ -11,16 +14,14 @@ export const createSecret = async (req, res) => {
     }
 
     const result = await sql`
-      INSERT INTO secrets (message)
-      VALUES (${message})
-      RETURNING id
+      INSERT INTO secrets (slug, message)
+      VALUES (${slug}, ${message})
+      RETURNING slug
     `;
-
-    const secretId = result[0].id;
 
     res
       .status(201)
-      .json({ success: true, message: "Secret created", id: secretId });
+      .json({ success: true, message: "Secret created", slug: result[0].slug });
   } catch (error) {
     console.error("Error creating secret:", error);
     res.status(500).json({ success: false, message: "Server error" });
@@ -29,11 +30,11 @@ export const createSecret = async (req, res) => {
 
 export const getSecret = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { slug } = req.params;
 
     const result = await sql`
         DELETE FROM secrets
-        WHERE id = ${id}
+        WHERE slug = ${slug}
         RETURNING message, created_at
     `;
 
@@ -51,15 +52,15 @@ export const getSecret = async (req, res) => {
         message: "Secret not found or already destroyed",
       });
     }
-    
+
     if (timeDifference > TIME_LIMIT) {
       res.status(410).json({
         success: true,
-        message: "Secret expired"
-      })
+        message: "Secret expired",
+      });
     }
     const secretMessage = result[0].message;
-    
+
     res.status(200).json({ success: true, message: secretMessage });
   } catch (error) {
     console.error("Error retrieving secret:", error);
