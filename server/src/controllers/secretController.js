@@ -54,7 +54,7 @@ export const getSecret = async (req, res) => {
     const timeDifference = currentTime - secretCreatedAt;
 
     if (timeDifference > TIME_LIMIT) {
-      res.status(410).json({
+      return res.status(410).json({
         success: true,
         message: "Secret expired",
       });
