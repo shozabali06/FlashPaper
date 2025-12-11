@@ -9,6 +9,7 @@ import {
 import { Button } from "./ui/button";
 import { Check, Copy, Lock, Plus } from "lucide-react";
 import { Textarea } from "./ui/textarea";
+import { encryptMessage, generateKey } from "@/lib/crypto";
 
 const FlashPaperCard = () => {
   const [secret, setSecret] = useState("");
@@ -27,6 +28,9 @@ const FlashPaperCard = () => {
     setError(null);
 
     try {
+      const encryptionKey = generateKey();
+      const encryptedContent = encryptMessage(secret, encryptionKey);
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/secret/create`,
         {
@@ -34,7 +38,7 @@ const FlashPaperCard = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ message: secret }),
+          body: JSON.stringify({ message: encryptedContent }),
         }
       );
 
@@ -46,7 +50,7 @@ const FlashPaperCard = () => {
         return;
       }
 
-      const link = `${window.location.origin}/secret/${data.slug}`;
+      const link = `${window.location.origin}/secret/${data.slug}#${encryptionKey}`;
       setSecretLink(link);
       setCopied(false);
       setLoading(false);

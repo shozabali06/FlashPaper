@@ -9,6 +9,7 @@ import {
 import { AlertTriangle, Eye, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Button } from "./ui/button";
+import { decryptMessage } from "@/lib/crypto";
 
 const RevealCard = ({ id }) => {
   const [loading, setLoading] = useState(false);
@@ -25,14 +26,8 @@ const RevealCard = ({ id }) => {
         `${import.meta.env.VITE_API_URL}/api/secret/${id}`
       );
 
-      if (response.status === 404) {
-        setError("Secret not found or has already been revealed.");
-        setLoading(false);
-        return;
-      }
-
-      if (response.status === 410) {
-        setError("This secret has expired and is no longer available.");
+      if (response.status === 404 || response.status === 410) {
+        setError("Secret not found or has already been revealed."); // simple fallback
         setLoading(false);
         return;
       }
@@ -45,8 +40,22 @@ const RevealCard = ({ id }) => {
         return;
       }
 
-      setSecret(data.message);
-      setRevealed(true);
+      const hash = window.location.hash.substring(1);
+
+      if (!hash) {
+        setError("Missing encryption key. Did you copy the full URL?");
+        setLoading(false);
+        return;
+      }
+
+      const decryptedText = decryptMessage(data.message, hash);
+
+      if (!decryptedText) {
+        setError("Decryption failed. Invalid key or corrupted data.");
+      } else {
+        setSecret(decryptedText);
+        setRevealed(true);
+      }
       setLoading(false);
     } catch (error) {
       console.error("Error retrieving secret:", error);
