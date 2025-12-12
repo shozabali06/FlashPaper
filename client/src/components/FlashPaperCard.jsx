@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Button } from "./ui/button";
-import { Check, Copy, Lock, Plus } from "lucide-react";
+import { Check, Copy, Lock, Plus, Share2 } from "lucide-react";
 import { Textarea } from "./ui/textarea";
 import { encryptMessage, generateKey } from "@/lib/crypto";
 
@@ -73,6 +73,38 @@ const FlashPaperCard = () => {
     setSecret("");
     setSecretLink(null);
     setError(null);
+  };
+
+  const shareText =
+    "Check out FlashPaper - Self-destructing secrets. One view, then gone! 🔐";
+  const appUrl = window.location.origin;
+
+  const shareOnWhatsApp = () => {
+    const url = `https://wa.me/?text=${encodeURIComponent(
+      shareText + " " + appUrl
+    )}`;
+    window.open(url, "_blank");
+  };
+
+  const shareOnFacebook = () => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      appUrl
+    )}`;
+    window.open(url, "_blank");
+  };
+
+  const shareOnX = () => {
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+      shareText
+    )}&url=${encodeURIComponent(appUrl)}`;
+    window.open(url, "_blank");
+  };
+
+  const shareOnThreads = () => {
+    const url = `https://threads.net/intent/post?text=${encodeURIComponent(
+      shareText + " " + appUrl
+    )}`;
+    window.open(url, "_blank");
   };
 
   return (
@@ -149,6 +181,51 @@ const FlashPaperCard = () => {
               >
                 <Plus className="w-4 h-4 mr-2" /> CREATE NEW SECRET
               </Button>
+            </div>
+
+            <div className="pt-4 border-t border-primary/30 space-y-3">
+              <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground">
+                <Share2 className="w-3 h-3" />
+                <span>SHARE FLASHPAPER</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                <Button
+                  onClick={shareOnWhatsApp}
+                  variant="outline"
+                  size="sm"
+                  className="border-primary/30 text-foreground hover:bg-primary/20 bg-transparent cursor-pointer text-xs"
+                  title="Share on WhatsApp"
+                >
+                  WhatsApp
+                </Button>
+                <Button
+                  onClick={shareOnFacebook}
+                  variant="outline"
+                  size="sm"
+                  className="border-primary/30 text-foreground hover:bg-primary/20 bg-transparent cursor-pointer text-xs"
+                  title="Share on Facebook"
+                >
+                  Facebook
+                </Button>
+                <Button
+                  onClick={shareOnX}
+                  variant="outline"
+                  size="sm"
+                  className="border-primary/30 text-foreground hover:bg-primary/20 bg-transparent cursor-pointer text-xs"
+                  title="Share on X"
+                >
+                  X
+                </Button>
+                <Button
+                  onClick={shareOnThreads}
+                  variant="outline"
+                  size="sm"
+                  className="border-primary/30 text-foreground hover:bg-primary/20 bg-transparent cursor-pointer text-xs"
+                  title="Share on Threads"
+                >
+                  Threads
+                </Button>
+              </div>
             </div>
           </div>
         )}
